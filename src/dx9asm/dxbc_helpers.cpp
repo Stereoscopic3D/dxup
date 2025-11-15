@@ -53,7 +53,19 @@ namespace dxup {
           uint32_t shift = i * 2;
           uint32_t mask = 0b0011u << shift;
           uint32_t swizzleIndex = (dx9Swizzle & mask) >> shift;
-          m_data[i] = originalData[swizzleIndex];
+          uint32_t modifier = operand.getModifier();
+          switch (modifier) {
+          default:
+            log::fail("Unimplemented operand modifier!");
+          case D3DSPSM_NONE:
+            m_data[i] = originalData[swizzleIndex]; break;
+          case D3DSPSM_NEG:
+            m_data[i] = originalData[swizzleIndex] ^ 0x80000000; break;
+          case D3DSPSM_ABS:
+            m_data[i] = originalData[swizzleIndex] & 0x7FFFFFFF; break;
+          case D3DSPSM_ABSNEG:
+            m_data[i] = originalData[swizzleIndex] | 0x80000000; break;
+          }
         }
 
         return;
